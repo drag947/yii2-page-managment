@@ -4,11 +4,16 @@ use yii\bootstrap4\Html;
 use rmrevin\yii\fontawesome\FAS;
 use yii\imperavi\Widget;
 use yii\helpers\Url;
+
 ?>
-<?php $form = ActiveForm::begin(['method'=>'post', 'action'=>Url::to(['seo-managment/update', 'id'=>$model->id])]); ?>
+<?php $form = ActiveForm::begin(['method'=>'post', 'action'=>Url::to([($model->isNewRecord) ? 'seo-managment/create' : 'seo-managment/update', 'id'=>$model->id])]); ?>
 <div class="card">
     <div class="card-body">
         <?php echo $form->errorSummary($model) ?>
+        
+        <?php if($model->isNewRecord) : ?>
+            <?= $form->field($model, 'page_id')->dropdownList($pages)?>
+        <?php endif;?>
         
         <?= $form->field($model, 'title')->textInput()?>
         

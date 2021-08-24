@@ -31,6 +31,17 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php elseif($type == 'meta_tags') : ?>
         <div class="tab-pane show active">
             <?php if ($model) : ?>
+                <p>
+                    <div class="dropdown">
+                        <a class="btn btn-info" data-toggle="dropdown" href="#"><?=Yii::t('backend', 'Choosing the language of meta tags')?></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <?php foreach (Yii::$app->params['availableLocales'] as $key => $lang) : ?>
+                                <li><a class="dropdown-item" href="<?=Url::to(['page-managment/meta-tags', 'id'=>$page->id, 'lang'=>$key])?>"><?=$lang?></a></li>
+
+                            <?php endforeach;?>
+                        </ul>
+                    </div>
+                </p>
                 <?= $this->render('../seo-managment/_form', [
                     'model' => $model,
                 ]) ?>

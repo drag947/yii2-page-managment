@@ -73,6 +73,14 @@ class PageManagmentController extends Controller {
     public function actionView($id) {
         $page = $this->findModel($id);
         
+        if($page->load(Yii::$app->request->post())) {
+            if( $page->save() ) {
+                Yii::$app->session->setFlash('success', Yii::t('backend', 'Updated!'));
+            }else{
+                Yii::$app->session->setFlash('error', Yii::t('backend', 'An error has occurred!'));
+            }
+        }
+        
         return $this->render('view', [
             'page' => $page,
             'type' => 'page'
@@ -115,7 +123,7 @@ class PageManagmentController extends Controller {
         if(!$model) {
             throw new NotFoundHttpException();
         }
-        $page = $this->findModel($model->id);
+        $page = $this->findModel($model->page_id);
         if( $model->load(Yii::$app->request->post()) ) {
             
             if( $model->save() ) {
@@ -124,16 +132,20 @@ class PageManagmentController extends Controller {
                 Yii::$app->session->setFlash('error', Yii::t('backend', 'An error has occurred!'));
             }
         }
-        return $this->render('alias-create', [
+        return $this->render('alias-update', [
             'model' => $model,
             'page'  => $page
         ]);
     }
     
-    public function actionMetaTags($id) {
+    public function actionMetaTags($id, $lang = false) {
         $page = $this->findModel($id);
         
-        $model = SeoManagment::findOne(['page_id'=>$id, 'lang'=>Yii::$app->language]);
+        if($lang) {
+            $model = SeoManagment::findOne(['page_id'=>$id, 'lang'=>$lang]);
+        }else{
+            $model = SeoManagment::findOne(['page_id'=>$id]);
+        }
         
         return $this->render('view', [
             'model' => $model,

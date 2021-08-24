@@ -12,7 +12,9 @@ use Yii;
 use yii\web\Controller;
 use drag947\pm\models\SeoManagmentSearch;
 use drag947\pm\models\SeoManagment;
+use drag947\pm\models\PageManagment;
 use yii\web\NotFoundHttpException;
+use yii\helpers\ArrayHelper;
 /**
  * Description of SeoManagmentController
  *
@@ -36,6 +38,9 @@ class SeoManagmentController extends Controller {
     
     public function actionCreate() {
         $model = new SeoManagment();
+        $pages = PageManagment::find()->select('id, path')->all();
+        $pages = ArrayHelper::map($pages, 'id', 'path');
+        
         if($model->load(Yii::$app->request->post())) {
             if($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Meta tags created!'));
@@ -46,7 +51,8 @@ class SeoManagmentController extends Controller {
         }
         
         return $this->render('create', [
-            'model'=>$model
+            'model'=>$model,
+            'pages'=>$pages
         ]);
     }
     

@@ -25,7 +25,15 @@ class PmAlias extends ActiveRecord {
         return [
             [['page_id', 'url'], 'required'],
             [['page_id'], 'integer'],
-            [['url'], 'string', 'max'=>255]
+            [['url'], 'string', 'max'=>255],
+            [['url'], 'unique'],
+            [['url'], 'filter', 'filter'=>function($value) {
+                return ($value === '/') ? $value : trim($value, '/');
+            }]
         ];
+    }
+    
+    public function getPage() {
+        return $this->hasOne(PageManagment::class, ['id'=>'page_id']);
     }
 }

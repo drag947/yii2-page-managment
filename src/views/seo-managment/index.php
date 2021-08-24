@@ -50,6 +50,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     'options' => ['style' => 'width: 5%'],
                 ],
                 [
+                    'attribute' => 'lang',
+                    'options' => ['style' => 'width: 5%'],
+                    'filter' => Yii::$app->params['availableLocales']
+                ],
+                [
                     'class' => \common\widgets\ActionColumn::class,
                     'options' => ['style' => 'width: 5%'],
                     'template' => '{update}',

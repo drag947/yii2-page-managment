@@ -24,7 +24,8 @@ class SeoManagmentSearch extends SeoManagment {
     {
         return [
             [['id'], 'integer'],
-            [['title', 'description', 'h_one'], 'string', 'max'=>255]
+            [['title', 'description', 'h_one'], 'string', 'max'=>255],
+            [['lang'], 'string', 'max'=>5]
         ];
     }
 
@@ -44,13 +45,22 @@ class SeoManagmentSearch extends SeoManagment {
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-
-        $query->andFilterWhere([
-            'id' => $this->id,
-        ]);
-        $query->andFilterWhere(['LIKE', 'title', '%'.$this->title.'%']);
-        $query->andFilterWhere(['LIKE', 'description', '%'.$this->description.'%']);
-        $query->andFilterWhere(['LIKE', 'h_one', '%'.$this->h_one.'%']);
+        if($this->id) {
+            $query->andFilterWhere(['id' => $this->id]);
+        }
+        if($this->lang) {
+            $query->andFilterWhere(['lang' => $this->lang]);
+        }
+        
+        if($this->title) {
+            $query->andFilterWhere(['LIKE', 'title', $this->title]);
+        }
+        if($this->description) {
+            $query->andFilterWhere(['LIKE', 'description', $this->description]);
+        }
+        if($this->h_one) {
+            $query->andFilterWhere(['LIKE', 'h_one', $this->h_one]);
+        }
 
         return $dataProvider;
     }

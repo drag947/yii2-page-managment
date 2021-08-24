@@ -48,7 +48,7 @@ class PageManagmentSearch extends PageManagment {
         $query->andFilterWhere([
             'id' => $this->id,
         ]);
-        $query->andFilterWhere(['LIKE', 'path', '%'.$this->path.'%']);
+        $query->andFilterWhere(['LIKE', 'path', $this->path]);
 
 
         return $dataProvider;
