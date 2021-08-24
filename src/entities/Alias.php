@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace backend\modules\pm\entities;
+namespace drag947\pm\entities;
 
 /**
  * Description of Alias

@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace backend\modules\pm\models;
+namespace drag947\pm\models;
 
 use Yii;
 use yii\db\ActiveRecord;

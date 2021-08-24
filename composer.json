@@ -2,7 +2,7 @@
     "name": "drag947/yii2-page-managment",
     "description": "Модуль управления страницей",
     "type": "yii2-extension",
-    "keywords": ["yii2","extension"],
+    "keywords": ["yii2","extension","starter-kit"],
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,8 @@
     ],
     "minimum-stability": "*",
     "require": {
-        "yiisoft/yii2": "~2.0.0"
+        "yiisoft/yii2": "~2.0.0",
+        "yii-starter-kit/yii2-starter-kit" : "4.0.0"
     },
     "autoload": {
         "psr-4": {

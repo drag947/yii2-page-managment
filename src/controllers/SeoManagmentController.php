@@ -10,8 +10,8 @@ namespace drag947\pm\controllers;
 
 use Yii;
 use yii\web\Controller;
-use backend\modules\pm\models\SeoManagmentSearch;
-use backend\modules\pm\models\SeoManagment;
+use drag947\pm\models\SeoManagmentSearch;
+use drag947\pm\models\SeoManagment;
 use yii\web\NotFoundHttpException;
 /**
  * Description of SeoManagmentController

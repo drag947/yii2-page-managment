@@ -9,7 +9,7 @@
 namespace drag947\pm;
 
 use yii\base\BootstrapInterface;
-use backend\modules\pm\models\PmAlias;
+use drag947\pm\models\PmAlias;
 use yii\web\UrlNormalizer;
 /**
  * Description of Bootstrap

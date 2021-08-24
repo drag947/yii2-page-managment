@@ -11,11 +11,11 @@ namespace drag947\pm\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\data\ActiveDataProvider;
-use backend\modules\pm\models\PageManagment;
-use backend\modules\pm\models\PageManagmentSearch;
-use backend\modules\pm\models\SeoManagment;
+use drag947\pm\models\PageManagment;
+use drag947\pm\models\PageManagmentSearch;
+use drag947\pm\models\SeoManagment;
 use yii\web\NotFoundHttpException;
-use backend\modules\pm\models\PmAlias;
+use drag947\pm\models\PmAlias;
 /**
  * Description of PageManagmentController
  *

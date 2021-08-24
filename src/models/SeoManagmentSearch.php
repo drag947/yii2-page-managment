@@ -6,12 +6,12 @@
  * and open the template in the editor.
  */
 
-namespace backend\modules\pm\models;
+namespace drag947\pm\models;
 
 use Yii;
 use yii\db\ActiveRecord;
 use yii\data\ActiveDataProvider;
-use backend\modules\pm\models\SeoManagment;
+use drag947\pm\models\SeoManagment;
 /**
  * Description of SearchModel
  *
