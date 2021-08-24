@@ -21,5 +21,11 @@
     },
     "extra": {
         "bootstrap": "drag947\\pm\\Bootstrap"
-    }
+    },
+    "repositories":[
+        {
+            "type": "git",
+            "url": "https://github.com/drag947/yii2-page-managment.git"
+        }
+    ]
 }
