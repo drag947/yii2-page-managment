@@ -10,7 +10,7 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist drag947/yii2-page-managment "*"
+composer require drag947/yii2-page-managment:dev-main
 ```
 
 or add
@@ -22,10 +22,11 @@ or add
 to the require section of your `composer.json` file.
 
 
+
 Usage
 -----
 
+yii migrate --migrationPath=@vendor/drag947/yii2-page-managment/src/migrations
+
 Once the extension is installed, simply use it in your code by  :
 
-```php
-<?= \drag947\pm\AutoloadExample::widget(); ?>```
