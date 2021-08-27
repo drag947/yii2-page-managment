@@ -26,7 +26,7 @@ to the require section of your `composer.json` file.
 Usage
 -----
 
-yii migrate --migrationPath=@vendor/drag947/yii2-page-managment/src/migrations
+php yii migrate --migrationPath=@vendor/drag947/yii2-page-managment/src/migrations --migrationTable={{%system_pm_migration}}
 
 Once the extension is installed, simply use it in your code by  :
 

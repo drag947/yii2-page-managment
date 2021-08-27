@@ -119,10 +119,8 @@ class PageManagmentController extends Controller {
     
     public function actionAliasUpdate($alias_id) {
         
-        $model = PmAlias::findOne((int)$alias_id);
-        if(!$model) {
-            throw new NotFoundHttpException();
-        }
+        $model = $this->findAlias((int)$alias_id);
+        
         $page = $this->findModel($model->page_id);
         if( $model->load(Yii::$app->request->post()) ) {
             
@@ -136,6 +134,25 @@ class PageManagmentController extends Controller {
             'model' => $model,
             'page'  => $page
         ]);
+    }
+    
+    public function actionAliasDelete($id) {
+        $model = $this->findAlias($id);
+                
+        if( $model->delete() ) {
+            Yii::$app->session->setFlash('success', Yii::t('backend', 'Alias deleted!'));
+        }else{
+            Yii::$app->session->setFlash('error', Yii::t('backend', 'An error has occurred!'));
+        }
+        return $this->redirect(['alias', 'id'=>$model->page_id]);
+    }
+    
+    private function findAlias($id) {
+        $model = PmAlias::findOne((int)$id);
+        if(!$model) {
+            throw new NotFoundHttpException();
+        }
+        return $model;
     }
     
     public function actionMetaTags($id, $lang = false) {

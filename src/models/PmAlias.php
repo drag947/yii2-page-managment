@@ -25,9 +25,9 @@ class PmAlias extends ActiveRecord {
         return [
             [['page_id', 'url'], 'required'],
             [['page_id'], 'integer'],
-            [['url'], 'string', 'max'=>255],
+            [['url', 'route'], 'string', 'max'=>255],
             [['url'], 'unique'],
-            [['url'], 'filter', 'filter'=>function($value) {
+            [['url', 'route'], 'filter', 'filter'=>function($value) {
                 return ($value === '/') ? $value : trim($value, '/');
             }]
         ];
