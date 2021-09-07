@@ -14,7 +14,8 @@
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "asofter/yii2-imperavi-redactor": ">=0.0.3@dev",
-        "yiisoft/yii2-bootstrap4": "^2.0"
+        "yiisoft/yii2-bootstrap4": "^2.0",
+        "drag947/yii2-language": "dev-master"
     },
     "autoload": {
         "psr-4": {
