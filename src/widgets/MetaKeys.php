@@ -11,6 +11,7 @@ namespace drag947\pm\widgets;
 use Yii;
 use drag947\pm\models\SeoManagment;
 use drag947\pm\models\PageManagment;
+use drag947\pm\models\PmAlias;
 use yii\helpers\Url;
 use yii\base\Widget;
 
@@ -24,10 +25,10 @@ class MetaKeys extends Widget {
     
     public function run() {
         $object = new MetaKeys();
-        $page = $object->getPage(Yii::$app->request->getPathInfo());
+        $page_id = $object->getPageId(Yii::$app->request->getPathInfo());
         $lang = Yii::$app->language;
-        if($page) {
-            $keys = $object->getMetaKeys($page->id, $lang);
+        if($page_id) {
+            $keys = $object->getMetaKeys($page_id, $lang);
             if($keys) {
                 return $object->getOpenGraph($keys, $lang);
             }
@@ -39,9 +40,19 @@ class MetaKeys extends Widget {
         return $keys;
     }
     
-    private function getPage($url) {
+    private function getPageId($url) {
+        $id = false;
         $page = PageManagment::findOne(['path'=>$url]);
-        return $page;
+        if(!$page) {
+            $page = PmAlias::findOne(['url' => $url]);
+            if($page) {
+                $id = $page->page_id;
+            }
+        }else{
+            $id = $page->id;
+        }
+        
+        return $id;
     }
     
     private function getOpenGraph($keys, $lang) {
