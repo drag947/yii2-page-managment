@@ -25,7 +25,7 @@ class MetaKeys extends Widget {
     
     public function run() {
         $object = new MetaKeys();
-        $page_id = $object->getPageId(Yii::$app->request->getPathInfo());
+        $page_id = $object->getPageId(Yii::$app->request->getPathInfo(), Yii::$app->request->queryParams);
         $lang = Yii::$app->language;
         if($page_id) {
             $keys = $object->getMetaKeys($page_id, $lang);
@@ -40,9 +40,17 @@ class MetaKeys extends Widget {
         return $keys;
     }
     
-    private function getPageId($url) {
+    private function getPageId($url, $params = '') {
+        $param = '';
+        if($params) {
+            $param = '?';
+            foreach ($params as $key => $value) {
+                $param .= $key.'='.$value.'&';
+            }
+            $param = trim($param, '&');
+        }
         $id = false;
-        $page = PageManagment::findOne(['path'=>$url]);
+        $page = PageManagment::findOne(['path'=>$url.$param]);
         if(!$page) {
             $page = PmAlias::findOne(['url' => $url]);
             if($page) {
