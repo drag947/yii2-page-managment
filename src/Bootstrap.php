@@ -12,6 +12,7 @@ use yii\base\BootstrapInterface;
 use drag947\pm\models\PmAlias;
 use yii\web\UrlNormalizer;
 use yii\helpers\Url;
+use drag947\pm\UrlRule;
 /**
  * Description of Bootstrap
  *
@@ -43,13 +44,13 @@ class Bootstrap implements BootstrapInterface {
         $urlManager = $app->getUrlManager();
         if($urlManager) {
             
-            $redirectUrl = $urlManager->parseRequest($app->request);
-            
-            if(isset($redirectUrl[0]) && $redirectUrl[0]) {
-                $redirect = PmAlias::find()->select('{{%pm_alias}}.*, {{%page_managment}}.path')
+            $redirectUrl = $app->request->resolve();
+            $redirectUrl = $this->builtUrl($redirectUrl[0], $redirectUrl[1]);
+            $redirect = PmAlias::find()->select('{{%pm_alias}}.*, {{%page_managment}}.path')
                         ->leftJoin('{{%page_managment}}', '{{%page_managment}}.id={{%pm_alias}}.page_id')
-                        ->where(['{{%page_managment}}.path'=>$redirectUrl[0]])
-                        ->orderBy('{{%pm_alias}}.id desc')->limit(1)->one();
+                        ->where(['{{%page_managment}}.path'=>$redirectUrl])
+                        ->orderBy('{{%pm_alias}}.id desc')->limit(1)->one();//var_dump(trim($_SERVER['REQUEST_URI'],'/'));var_dump($redirectUrl);die();
+            if( $redirect && $redirect->url !== trim($_SERVER['REQUEST_URI'],'/') ) {
                 Url::remember($app->request->getPathInfo(), 'url-'.$app->request->getPathInfo());
                 
                 if($redirect && !isset($_SESSION['url-'.$redirect->url])) {
@@ -57,9 +58,9 @@ class Bootstrap implements BootstrapInterface {
                     $app->response->redirect([$redirect->url], 301)->send();
                     die();
                 }
-                $this->removeSession();
+                
             }
-            
+            $this->removeSession();
         }
     }
     
@@ -77,6 +78,7 @@ class Bootstrap implements BootstrapInterface {
         if($rules) {
             $app->getUrlManager()->addRules($rules, false);
         }
+        $app->getUrlManager()->addRules($this->endRule(), true);
     }
     
     private function newRules($app) {
@@ -101,6 +103,7 @@ class Bootstrap implements BootstrapInterface {
                     }
                 }
                 $result[] = [
+                    'class' => UrlRule::class,
                     'pattern'=>$alia['url'],
                     'route' => $path,
                     'defaults' => $defaults
@@ -110,5 +113,23 @@ class Bootstrap implements BootstrapInterface {
         return $result;
     }
     
+    private function endRule() {
+        return [
+            ['class' => UrlRuleEnd::class]
+        ];
+    }
+    
+    private function builtUrl($route, $params = []) {
+        $url = $route;
+        if(empty($params)) {
+            return $url;
+        }
+        $url .= '?';
+        foreach ($params as $key => $value) {
+            $url .= $key.'='.$value.'&';
+        }
+        $url = trim($url, '&');
+        return $url;
+    }
     
 }
