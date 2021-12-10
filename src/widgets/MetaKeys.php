@@ -39,7 +39,7 @@ class MetaKeys extends Widget {
         $keys = SeoManagment::findOne(['page_id' => $page_id, 'lang' => $lang]);
         return $keys;
     }
-    
+    /* переделать под url-manager искать по реальному url */
     private function getPageId($url, $params = '') {
         $param = '';
         if($params) {

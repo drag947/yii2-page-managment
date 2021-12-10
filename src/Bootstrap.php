@@ -78,7 +78,7 @@ class Bootstrap implements BootstrapInterface {
         if($rules) {
             $app->getUrlManager()->addRules($rules, false);
         }
-        $app->getUrlManager()->addRules($this->endRule(), true);
+        //$app->getUrlManager()->addRules($this->endRule(), true);
     }
     
     private function newRules($app) {
@@ -103,7 +103,7 @@ class Bootstrap implements BootstrapInterface {
                     }
                 }
                 $result[] = [
-                    'class' => UrlRule::class,
+                    //'class' => UrlRule::class,
                     'pattern'=>$alia['url'],
                     'route' => $path,
                     'defaults' => $defaults
