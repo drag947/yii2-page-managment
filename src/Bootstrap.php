@@ -8,6 +8,7 @@
 
 namespace drag947\pm;
 
+use Yii;
 use yii\base\BootstrapInterface;
 use drag947\pm\models\PmAlias;
 use yii\web\UrlNormalizer;
