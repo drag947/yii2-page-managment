@@ -41,6 +41,7 @@ class Bootstrap implements BootstrapInterface {
     }
     
     private function redirect($app) {
+        Yii::$app->session->open();
         $urlManager = $app->getUrlManager();
         if($urlManager) {
             
