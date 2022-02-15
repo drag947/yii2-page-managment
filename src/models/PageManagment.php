@@ -28,4 +28,9 @@ class PageManagment extends ActiveRecord {
             [['path'], 'string', 'max'=>255]
         ];
     }
+    
+    public function getAlias() {
+        return $this->hasMany(PmAlias::class, ['page_id' => 'id']);
+    }
+    
 }

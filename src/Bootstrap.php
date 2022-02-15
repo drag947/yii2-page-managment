@@ -11,6 +11,7 @@ namespace drag947\pm;
 use Yii;
 use yii\base\BootstrapInterface;
 use drag947\pm\models\PmAlias;
+use drag947\pm\models\PageManagment;
 use yii\web\UrlNormalizer;
 use yii\helpers\Url;
 use drag947\pm\UrlRule;
@@ -22,18 +23,35 @@ use drag947\pm\UrlRule;
 class Bootstrap implements BootstrapInterface {
     
     public function bootstrap($app) {
-        $this->addRules($app);
+        //$this->addRules($app);
         //$app->getSession()->removeAll();
-        $this->redirect($app);
+        //$this->redirect($app);
+    }
+    
+    private function redirect($app) {
         
+        $url = $this->builtUrl($app->request->getPathInfo(), $app->request->get());
+        $page = PmAlias::find()->where(['url' => $url])->limit(1)->one();
+        if($page) {
+            $redirectUrl = PmAlias::find()->where(['page_id'=>$page->page_id])->orderBy('id desc')->limit(1)->one();
+            //var_dump($redirectUrl->url);var_dump($url);die();
+            if($redirectUrl && $redirectUrl->url != $url) {
+                $app->response->redirect([$redirectUrl->url], 301)->send();
+                die();
+            }else{
+                
+            }
+        }
     }
     
     private function redirect1($app) {
-        $alias = PmAlias::find()->where(['url'=>$app->request->getPathInfo()])->limit(1)->one();
-        if($alias) {
-            $redirectUrl = PmAlias::find()->where(['page_id'=>$alias->page_id])->orderBy('id desc')->limit(1)->one();
-            
-            if($redirectUrl && $redirectUrl->id != $alias->id) {
+        $url = $app->request->resolve();
+        $url = $this->builtUrl($url[0], $url[1]);
+        $page = PageManagment::find()->where(['path' => $url])->limit(1)->one();
+        if($page) {
+            $redirectUrl = PmAlias::find()->where(['page_id'=>$page->id])->orderBy('id desc')->limit(1)->one();
+            var_dump($redirectUrl->url);var_dump($url);die();
+            if($redirectUrl && $redirectUrl->url != $url) {
                 $app->response->redirect([$redirectUrl->url], 301)->send();
                 die();
             }
@@ -41,6 +59,7 @@ class Bootstrap implements BootstrapInterface {
         }
     }
     
+    /*
     private function redirect($app) {
         Yii::$app->session->open();
         $urlManager = $app->getUrlManager();
@@ -64,7 +83,7 @@ class Bootstrap implements BootstrapInterface {
             }
             $this->removeSession();
         }
-    }
+    }*/
     
     private function removeSession($except = null) {
         foreach ($_SESSION as $key => $session) {
