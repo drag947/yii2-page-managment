@@ -105,6 +105,7 @@ class PageManagmentController extends Controller {
         $page = $this->findModel($id);
         $model = new PmAlias();
         if( $model->load(Yii::$app->request->post()) ) {
+            
             $model->page_id = $page->id;
             if( $model->save() ) {
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Alias created!'));
@@ -154,6 +155,10 @@ class PageManagmentController extends Controller {
             throw new NotFoundHttpException();
         }
         return $model;
+    }
+    
+    public function actionSlug() {
+        
     }
     
     public function actionMetaTags($id, $lang = false) {

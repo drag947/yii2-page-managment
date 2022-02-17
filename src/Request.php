@@ -17,14 +17,15 @@ class Request extends \yii\web\Request {
     
     public function resolve(): array {
         
+        $url = $this->getPathInfo();
+        //$url = $this->builtUrl($this->getPathInfo(), $this->get());
         
-        $url = $this->builtUrl($this->getPathInfo(), $this->get());
-        $page = PmAlias::find()->where(['url' => $url])->limit(1)->one();
+        $page = PmAlias::find()->where(['route' => $url])->limit(1)->one();
         if($page) {
             $alias = PmAlias::find()->with('page')->where(['page_id'=>$page->page_id])->orderBy('id desc')->limit(1)->one();
             
-            if($alias && $alias->url != $url) {
-                Yii::$app->response->redirect([$alias->url], 301)->send();
+            if($alias && $alias->route != $url) {
+                Yii::$app->response->redirect([$alias->route], 301)->send();
                 die();
             }
             $result = $this->spreadUrl($alias->page->path);

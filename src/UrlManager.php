@@ -39,7 +39,7 @@ class UrlManager extends \yii\web\UrlManager {
                 if($page) {
                     $alia = PmAlias::find()->where(['page_id' => $page->id])->orderBy('id desc')->limit(1)->one();
                     if($alia) {
-                        $url = $alia->url;
+                        $url = $this->replace($alia->url, $page->path);
                     }
                 }
             }
@@ -102,15 +102,26 @@ class UrlManager extends \yii\web\UrlManager {
         return $url . $anchor;
     }
     
+    private function replace($alia, $path) {
+        list($route, $params) = $this->spreadUrl($path);
+        $params = $this->replaceSlug($params);
+        
+        foreach ($params as $key => $param) {
+            $alia = str_replace('<'.$key.'>', $param, $alia);
+        }
+        return $alia;
+    }
+    
     private function replaceSlug($params) {
         $result = [];
         foreach ($params as $key => $value) {
-            $slug = PmSlugs::findOne(['value' => $value, 'param' => $key]);
+            $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
+            
             if(!$slug) {
                 $result[$key] = $value;
                 continue;
             }
-            $result[$key] = $slug->key;
+            $result[$key] = $slug->value;
         }
         return $result;
     }
@@ -126,5 +137,20 @@ class UrlManager extends \yii\web\UrlManager {
         }
         $url = trim($url, '&');
         return $url;
+    }
+    
+    private function spreadUrl($url) {
+        $params = [];
+        $result = explode('?', $url);
+        $route = $result[0];
+        
+        if(isset($result[1])) {
+            foreach (explode('&', $result[1]) as $key => $value) {
+                $i = strpos($value, '=');
+                $params[substr($value, 0, $i)] = substr($value, $i + 1); 
+            }
+        }
+       
+        return [$route, $params];
     }
 }

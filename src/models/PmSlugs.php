@@ -2,6 +2,7 @@
 
 namespace drag947\pm\models;
 
+use Yii;
 /**
  * Description of PmSlugs
  *
@@ -17,6 +18,14 @@ class PmSlugs extends \yii\db\ActiveRecord {
         return [
             [['key', 'value', 'param'], 'required'],
             [['value', 'param'], 'string', 'max' => 255]
+        ];
+    }
+    
+    public function attributeLabels() {
+        return [
+            'key' => Yii::t('pm', 'Real value'),
+            'value' => Yii::t('pm', 'Slug'),
+            'param' => Yii::t('pm', 'Parameter')
         ];
     }
 }

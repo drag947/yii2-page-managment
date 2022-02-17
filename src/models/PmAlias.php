@@ -86,4 +86,19 @@ class PmAlias extends ActiveRecord {
         $url = trim($url, '&');
         return $url;
     }
+    
+    private function replace($alia, $path) {
+        list($route, $params) = $this->spreadUrl($path);
+        $params = $this->replaceSlug($params);
+        
+        foreach ($params as $key => $param) {
+            $alia = str_replace('<'.$key.'>', $param, $alia);
+        }
+        return $alia;
+    }
+    
+    public function beforeSave($insert) {
+        $this->route = $this->replace($this->url, $this->page->path);
+        return parent::beforeSave($insert);
+    }
 }
