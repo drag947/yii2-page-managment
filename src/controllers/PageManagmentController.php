@@ -157,10 +157,6 @@ class PageManagmentController extends Controller {
         return $model;
     }
     
-    public function actionSlug() {
-        
-    }
-    
     public function actionMetaTags($id, $lang = false) {
         $page = $this->findModel($id);
         
