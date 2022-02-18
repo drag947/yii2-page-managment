@@ -35,9 +35,9 @@ class UrlManager extends \yii\web\UrlManager {
             }
             if($url === false) {
                 $sendUrl = $this->builtUrl($route, $params);
-                $page = PageManagment::findOne(['path' => $sendUrl]);
+                $page = PageManagment::findByRouteAndParams($route, $params);
                 if($page) {
-                    $alia = PmAlias::find()->where(['page_id' => $page->id])->orderBy('id desc')->limit(1)->one();
+                    $alia = PmAlias::find()->where(['page_id' => $page->id])->orderBy('sort asc')->limit(1)->one();
                     if($alia) {
                         $url = $this->replace($alia->url, $page->path);
                     }
@@ -104,7 +104,7 @@ class UrlManager extends \yii\web\UrlManager {
     
     private function replace($alia, $path) {
         list($route, $params) = $this->spreadUrl($path);
-        $params = $this->replaceSlug($params);
+        $params = $this->replaceSlugCreate($params);
         
         foreach ($params as $key => $param) {
             $alia = str_replace('<'.$key.'>', $param, $alia);
@@ -112,7 +112,7 @@ class UrlManager extends \yii\web\UrlManager {
         return $alia;
     }
     
-    private function replaceSlug($params) {
+    private function replaceSlugCreate($params) {
         $result = [];
         foreach ($params as $key => $value) {
             $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
@@ -122,6 +122,19 @@ class UrlManager extends \yii\web\UrlManager {
                 continue;
             }
             $result[$key] = $slug->value;
+        }
+        return $result;
+    }
+    
+    private function replaceSlugEntry($params) {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $slug = PmSlugs::findOne(['value' => $value, 'param' => $key]);
+            if(!$slug) {
+                $result[$key] = $value;
+                continue;
+            }
+            $result[$key] = $slug->key;
         }
         return $result;
     }

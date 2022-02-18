@@ -3,6 +3,7 @@
 namespace drag947\pm\models;
 
 use Yii;
+use drag947\pm\models\PmAlias;
 /**
  * Description of PmSlugs
  *
@@ -27,5 +28,10 @@ class PmSlugs extends \yii\db\ActiveRecord {
             'value' => Yii::t('pm', 'Slug'),
             'param' => Yii::t('pm', 'Parameter')
         ];
+    }
+    
+    public function afterSave($insert, $changedAttributes) {
+        
+        parent::afterSave($insert, $changedAttributes);
     }
 }

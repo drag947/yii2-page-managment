@@ -9,6 +9,14 @@ namespace drag947\pm;
  */
 class Url {
     
+    private $path;
+    private $alias = [];
+    private $route;
+    private $params = [];
+    
+    public function __construct() {
+        ;
+    }
     
     
 }

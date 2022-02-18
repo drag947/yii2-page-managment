@@ -2,6 +2,7 @@
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use richardfan\sortable\SortableGridView;
 ?>
 <div class="card">
     <div class="card-header">
@@ -10,17 +11,18 @@ use yii\helpers\Url;
         </p>
     </div>
     <div class="card-body p-0">
-         <?= GridView::widget([
+         <?= SortableGridView::widget([
+            'sortUrl' => Url::to(['sort-alias']),
             'dataProvider' => $dataProvider,
             'options' => [
                 'class' => ['gridview', 'table-responsive'],
             ],
             'tableOptions' => [
-                'class' => ['table', 'text-nowrap', 'table-striped', 'table-bordered', 'mb-0', 'table-sm'],
+                'class' => 'table text-nowrap table-striped table-bordered mb-0 table-sm',
             ],
             'columns' => [
                 [
-                    'attribute' => 'id',
+                    'attribute' => 'sort',
                     'options' => ['style' => 'width: 5%'],
                 ],
                 [

@@ -4,6 +4,7 @@ namespace drag947\pm\controllers;
 
 use yii\data\ActiveDataProvider;
 use drag947\pm\models\PmSlugs;
+use yii\web\NotFoundHttpException;
 /**
  * Description of SlugController
  *
@@ -21,5 +22,35 @@ class SlugController extends \yii\web\Controller {
         return $this->render('index', [
             'dataProvider' => $dataProvider
         ]);
+    }
+    
+    public function actionUpdate($id) {
+        
+    }
+    
+    public function actionCreate($id) {
+        $model = $this->findModel($id);
+        
+        if($model->load(Yii::$app->request->post()) && $model->save() ) {
+            Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug created'));
+        }
+        
+        if($model->hasErrors()) {
+            foreach ($model->getFirstErrors() as $error) {
+                Yii::$app->session->addFlash('error', $error);
+            }
+        }
+        
+        return $this->render('create', [
+            'model' => $model
+        ]);
+    }
+    
+    private function findModel($id) {
+        $model = PmSlugs::findOne($id);
+        if(!$model) {
+            throw new NotFoundHttpException();
+        }
+        return $model;
     }
 }

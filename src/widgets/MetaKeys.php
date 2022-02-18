@@ -23,7 +23,7 @@ use yii\base\Widget;
 class MetaKeys extends Widget {
     
     
-    public function run() {
+    public function run() {return;
         $object = new MetaKeys();
         $page_id = $object->getPageId(Yii::$app->request->getPathInfo(), Yii::$app->request->queryParams);
         $lang = Yii::$app->language;
@@ -50,7 +50,7 @@ class MetaKeys extends Widget {
             $param = trim($param, '&');
         }
         $id = false;
-        $page = PageManagment::findOne(['path'=>$url.$param]);
+        $page = PageManagment::findByRouteAndParams($url, $params);
         if(!$page) {
             $page = PmAlias::findOne(['url' => $url]);
             if($page) {

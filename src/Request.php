@@ -18,11 +18,11 @@ class Request extends \yii\web\Request {
     public function resolve(): array {
         
         $url = $this->getPathInfo();
-        //$url = $this->builtUrl($this->getPathInfo(), $this->get());
         
+        $page = false;
         $page = PmAlias::find()->where(['route' => $url])->limit(1)->one();
         if($page) {
-            $alias = PmAlias::find()->with('page')->where(['page_id'=>$page->page_id])->orderBy('id desc')->limit(1)->one();
+            $alias = PmAlias::find()->with('page')->where(['page_id'=>$page->page_id])->orderBy('sort asc')->limit(1)->one();
             
             if($alias && $alias->route != $url) {
                 Yii::$app->response->redirect([$alias->route], 301)->send();

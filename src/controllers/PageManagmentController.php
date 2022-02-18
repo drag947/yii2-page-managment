@@ -16,6 +16,8 @@ use drag947\pm\models\PageManagmentSearch;
 use drag947\pm\models\SeoManagment;
 use yii\web\NotFoundHttpException;
 use drag947\pm\models\PmAlias;
+use yii\base\DynamicModel;
+use richardfan\sortable\SortableAction;
 /**
  * Description of PageManagmentController
  *
@@ -23,7 +25,15 @@ use drag947\pm\models\PmAlias;
  */
 class PageManagmentController extends Controller {
     
-    
+    public function actions() {
+        return [
+            'sort-alias' => [
+                'class' => SortableAction::class,
+                'activeRecordClassName' => PmAlias::class,
+                'orderColumn' => 'sort',
+            ],
+        ];
+    }
     
     public function actionIndex() {
         $searchModel = new PageManagmentSearch();
@@ -39,28 +49,20 @@ class PageManagmentController extends Controller {
     }
     
     public function actionCreate() {
-        $model = new PageManagment();
-        $modelMeta = new SeoManagment();
+        $model = $this->formPage();
         $transaction = Yii::$app->db->beginTransaction();
         if($model->load(Yii::$app->request->post())) {
             try {
-                if( $model->save() ) {
-                    $modelMeta->page_id = $model->id;
-                    $modelMeta->lang = Yii::$app->language;
-                    if( $modelMeta->save() ) {
-                        $transaction->commit();
-                        Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
-                        return $this->redirect(['index']);
-                    }else{
-                        Yii::$app->session->setFlash('error', $model->errors);
-                    }
-                }else{
-                    Yii::$app->session->setFlash('error', $modelMeta->errors);
-                }
+                $this->module->getUrlService()->createPage($model->path);
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
+                return $this->redirect(['index']);
+                
+            }catch (\drag947\pm\MessageException $ex) {
+                Yii::$app->session->setFlash('error', $ex->getMessage());
                 $transaction->rollBack();
             } catch (\Exception $ex) {
-                Yii::error($ex->getMessage(), 'pm');
-                Yii::$app->session->setFlash('error', Yii::t('backend', 'An error has occurred!'));
+                throw $ex;
                 $transaction->rollBack();
             }
         }
@@ -88,11 +90,22 @@ class PageManagmentController extends Controller {
         ]);
     }
     
+    private function formPage($insert = true) {
+        $model = new DynamicModel();
+        $model->defineAttribute('path');
+        $model->defineAttribute('isNewRecord', $insert);
+        $model->addRule('path', 'required');
+        return $model;
+    }
+    
     public function actionAlias($id) {
         $page = $this->findModel($id);
         $dataProvider = new ActiveDataProvider([
             'query' => PmAlias::find()->where(['page_id'=>(int)$id])
         ]);
+        $dataProvider->sort = [
+            'defaultOrder' => ['sort' => SORT_ASC],
+        ];
         
         return $this->render('view', [
             'dataProvider' => $dataProvider,

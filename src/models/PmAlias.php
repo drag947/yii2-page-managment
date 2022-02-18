@@ -24,7 +24,8 @@ class PmAlias extends ActiveRecord {
     public function rules() {
         return [
             [['page_id', 'url'], 'required'],
-            [['page_id'], 'integer'],
+            [['page_id', 'sort'], 'integer'],
+            ['sort', 'unique'],
             [['url', 'route'], 'string', 'max'=>255],
             [['url'], 'unique'],
             [['url', 'route'], 'filter', 'filter'=>function($value) {
@@ -49,12 +50,12 @@ class PmAlias extends ActiveRecord {
     private function replaceSlug($params) {
         $result = [];
         foreach ($params as $key => $value) {
-            $slug = PmSlugs::findOne(['value' => $value, 'param' => $key]);
+            $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
             if(!$slug) {
                 $result[$key] = $value;
                 continue;
             }
-            $result[$key] = $slug->key;
+            $result[$key] = $slug->value;
         }
         return $result;
     }
@@ -99,6 +100,9 @@ class PmAlias extends ActiveRecord {
     
     public function beforeSave($insert) {
         $this->route = $this->replace($this->url, $this->page->path);
+        if($insert) {
+            //$this->sort = self::find()->select('Sum(sort) as sum')->asArray()->one()['sum'] + 1;
+        }
         return parent::beforeSave($insert);
     }
 }
