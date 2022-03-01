@@ -101,7 +101,7 @@ class PmAlias extends ActiveRecord {
     public function beforeSave($insert) {
         $this->route = $this->replace($this->url, $this->page->path);
         if($insert) {
-            //$this->sort = self::find()->select('Sum(sort) as sum')->asArray()->one()['sum'] + 1;
+            $this->sort = self::find()->select('Sum(sort) as sum')->asArray()->one()['sum'] + 1;
         }
         return parent::beforeSave($insert);
     }

@@ -20,7 +20,7 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
-
+        $this->registerTranslations();
         
     }
     
@@ -29,6 +29,17 @@ class Module extends \yii\base\Module
             $this->urlService = new UrlService(Yii::$app->db);
         }
         return $this->urlService;
+    }
+    
+    public function registerTranslations()
+    {
+        Yii::$app->i18n->translations['pm'] = [
+            'class'          => 'yii\i18n\PhpMessageSource',
+            'basePath'       => '@vendor/drag947/yii2-page-managment/src/messages',
+            'fileMap'        => [
+                'pm' => 'pm.php'
+            ]
+        ];
     }
     
 }
