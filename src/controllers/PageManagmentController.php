@@ -89,6 +89,13 @@ class PageManagmentController extends Controller {
         ]);
     }
     
+    public function actionDelete($id) {
+        $page = $this->findModel($id);
+        $page->delete();
+        Yii::$app->session->setFlash('success', Yii::t('backend', 'Delete!'));
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+    
     private function formPage($insert = true) {
         $model = new DynamicModel();
         $model->defineAttribute('path');

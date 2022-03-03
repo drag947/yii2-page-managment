@@ -10,15 +10,33 @@ use drag947\pm\models\PageParams;
 use drag947\pm\models\SeoManagment;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
 /**
  * Description of UrlService
  *
  * @author ilya
  */
 class UrlService {
+    /*
+     * [
+     *  'name_entity' => [
+     *          'class' => ActiveRecord,
+     *          'field' => string
+     *      ]
+     * ]
+     */
+    private $entities;
     
-    public function __construct() {
-        ;
+    private function hasEntity($key) {
+        return isset($this->entities[$key]);
+    }
+    
+    private function getEntity($key) {
+        return $this->entities[$key];
+    }
+    
+    public function __construct($entities = []) {
+        $this->entities = $entities;
     }
     
     
@@ -35,11 +53,30 @@ class UrlService {
         $seo = new SeoManagment();
         $seo->lang = Yii::$app->language;
         
-        
             
         if( !$page->save() ) {
             throw new PmException('page not save. path:'.$path);
         }
+        
+        $newParams = $this->replaceSlug($params);
+        
+        if($newParams !== $params) {
+            foreach ($newParams as $k => $param) {
+                if($param !== $params[$k]) {
+                    $slug = new PmSlugs([
+                        'param' => $k,
+                        'key' => $params[$k],
+                        'value' => $param
+                    ]);
+                    
+                    $slug->save();
+                    if($slug->hasErrors()) {
+                        throw new PmException(implode('|', $slug->getFirstErrors()));
+                    }
+                }
+            }
+        }
+        
         $seo->page_id = $page->id;
         if( !$seo->save() ) {
             throw new PmException('seo for page not save. path:'.$path);
@@ -62,6 +99,58 @@ class UrlService {
     
     public function deletePage() {
         
+    }
+    
+    public function createSlug($model) {
+        $model->save();
+        
+        if($model->hasErrors()) {
+            throw new MessageException(implode('|', $model->getFirstErrors()));
+        }
+        
+        $models = $this->findPagesByParam($model->param, $model->key);
+        
+        foreach ($models as $model) {
+            if(!$model->page->alias) {
+                continue;
+            }
+            $alias = $model->page->alias[0];
+            $newAlias = new PmAlias();
+            $newAlias->url = $alias->url;
+            $newAlias->page_id = $alias->page_id;
+            $newAlias->save();
+            
+            if($newAlias->hasErrors()) {
+                throw new MessageException(implode('|', $newAlias->getFirstErrors()));
+            }
+        }
+    }
+    
+    public function deleteSlug($model) {
+        $models = $this->findPagesByParam($model->param, $model->key);
+        $model->delete();
+        foreach ($models as $model) {
+            if(!$model->page->alias) {
+                continue;
+            }
+            $alias = $model->page->alias[0];
+            
+            $newAlias = new PmAlias();
+            $newAlias->url = $alias->url;
+            $newAlias->page_id = $alias->page_id;
+            $alias->delete();
+            $newAlias->save();
+            
+            if($newAlias->hasErrors()) {
+                throw new MessageException(implode('|', $newAlias->getFirstErrors()));
+            }
+        }
+    }
+    
+    private function findPagesByParam($param, $key) {
+        return PageParams::find()->with(['page', 'page.alias' => function ($query) {
+            $query->limit(1)->orderBy('id');
+        }])->where(['param' => $param])->andWhere(['value' => $key])->all();
     }
     
     private function findRealUrlPage($path) {
@@ -97,7 +186,7 @@ class UrlService {
             }
         }
         
-        return false;
+        return true;
     }
     
     public static function replace($alia, $path) {
@@ -116,12 +205,26 @@ class UrlService {
             $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
             
             if(!$slug) {
+                if($this->hasEntity($key)) {
+                    $entity = $this->getEntity($key);
+                    $result[$key] = $this->autoSlug($entity, $value);
+                    continue;
+                }
                 $result[$key] = $value;
                 continue;
             }
             $result[$key] = $slug->value;
         }
         return $result;
+    }
+    
+    private function autoSlug($entity, $key) {
+        $name = Yii::$app->db->createCommand("SELECT ".$entity['field']." FROM ".$entity['table']." WHERE ".$entity['id']." = :id LIMIT 1", [':id' => $key])->queryOne();
+        if(!$name) {
+            return $key;
+        }
+        return substr(Inflector::slug($name[$entity['field']]), 0, 70);
+        //return Inflector::slug($entity['class']::find()->where([$entity['id'] => $value])->limit(1)->one()[$entity['field']]);
     }
     
     public static function builtUrl($route, $params = []) {

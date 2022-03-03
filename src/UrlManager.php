@@ -25,7 +25,7 @@ class UrlManager extends \yii\web\UrlManager {
         unset($params[0]);
 
         $baseUrl = $this->showScriptName || !$this->enablePrettyUrl ? $this->getScriptUrl() : $this->getBaseUrl();
-
+        
         if ($this->enablePrettyUrl) {
             $cacheKey = $route . '?';
             foreach ($params as $key => $value) {
@@ -39,16 +39,22 @@ class UrlManager extends \yii\web\UrlManager {
                 if($page) {
                     $alia = PmAlias::find()->where(['page_id' => $page->id])->orderBy('sort asc')->limit(1)->one();
                     if($alia) {
-                        $url = $this->replace($alia->url, $page->path);
+                        //$url = $this->replace($alia->url, $page->path);
+                        $url = $alia->route;
                     }
                 }
             }
+            
             if($url === false) {
                 $url = $this->getUrlFromCache($cacheKey, $route, $params);
             }
+            
             if ($url === false) {
+                $params = $this->replaceSlugCreate($params);
                 /* @var $rule UrlRule */
-                foreach ($this->rules as $rule) {
+                $rules = $this->rules;
+                sort($rules);
+                foreach ($rules as $rule) {
                     //if (in_array($rule, $this->_ruleCache[$cacheKey], true)) {
                         // avoid redundant calls of `UrlRule::createUrl()` for rules checked in `getUrlFromCache()`
                         // @see https://github.com/yiisoft/yii2/issues/14094

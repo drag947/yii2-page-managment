@@ -23,9 +23,9 @@ use yii\base\Widget;
 class MetaKeys extends Widget {
     
     
-    public function run() {return;
-        $object = new MetaKeys();
-        $page_id = $object->getPageId(Yii::$app->request->getPathInfo(), Yii::$app->request->queryParams);
+    public function run() {
+        $object = $this;
+        $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
         if($page_id) {
             $keys = $object->getMetaKeys($page_id, $lang);
@@ -41,16 +41,10 @@ class MetaKeys extends Widget {
     }
     /* переделать под url-manager искать по реальному url */
     private function getPageId($url, $params = '') {
-        $param = '';
-        if($params) {
-            $param = '?';
-            foreach ($params as $key => $value) {
-                $param .= $key.'='.$value.'&';
-            }
-            $param = trim($param, '&');
-        }
+        
         $id = false;
         $page = PageManagment::findByRouteAndParams($url, $params);
+        var_dump($url, $params);
         if(!$page) {
             $page = PmAlias::findOne(['url' => $url]);
             if($page) {

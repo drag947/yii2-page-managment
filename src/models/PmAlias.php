@@ -27,7 +27,7 @@ class PmAlias extends ActiveRecord {
             [['page_id', 'sort'], 'integer'],
             ['sort', 'unique'],
             [['url', 'route'], 'string', 'max'=>255],
-            [['url'], 'unique'],
+            //[['url'], 'unique'],
             [['url', 'route'], 'filter', 'filter'=>function($value) {
                 return ($value === '/') ? $value : trim($value, '/');
             }]
@@ -91,7 +91,7 @@ class PmAlias extends ActiveRecord {
     private function replace($alia, $path) {
         list($route, $params) = $this->spreadUrl($path);
         $params = $this->replaceSlug($params);
-        
+        //$params = $this->replaceSlug($params);
         foreach ($params as $key => $param) {
             $alia = str_replace('<'.$key.'>', $param, $alia);
         }
@@ -101,7 +101,7 @@ class PmAlias extends ActiveRecord {
     public function beforeSave($insert) {
         $this->route = $this->replace($this->url, $this->page->path);
         if($insert) {
-            $this->sort = self::find()->select('Sum(sort) as sum')->asArray()->one()['sum'] + 1;
+            $this->sort = self::find()->select('COUNT(*) as sum')->asArray()->one()['sum'] + 1;
         }
         return parent::beforeSave($insert);
     }

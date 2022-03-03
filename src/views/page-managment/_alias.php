@@ -30,6 +30,10 @@ use richardfan\sortable\SortableGridView;
                     'options' => ['style' => 'width: 5%'],
                 ],
                 [
+                    'attribute' => 'route',
+                    'options' => ['style' => 'width: 5%'],
+                ],
+                [
                     'class' => \common\widgets\ActionColumn::class,
                     'options' => ['style' => 'width: 5%'],
                     'template' => '{alias-update} {alias-delete}',

@@ -21,4 +21,8 @@ class PageParams extends \yii\db\ActiveRecord {
             ['page_id', 'integer']
         ];
     }
+    
+    public function getPage() {
+        return $this->hasOne(PageManagment::class, ['id' => 'page_id']);
+    }
 }

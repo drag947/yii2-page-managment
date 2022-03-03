@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'class' => \common\widgets\ActionColumn::class,
                     'options' => ['style' => 'width: 5%'],
-                    'template' => '{view}',
+                    'template' => '{view} {delete}',
                 ],
             ],
         ]) ?>

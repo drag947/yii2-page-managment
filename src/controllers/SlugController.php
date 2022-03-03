@@ -27,9 +27,10 @@ class SlugController extends \yii\web\Controller {
     
     public function actionUpdate($id) {
         $model = $this->findModel($id);
-        
-        if($model->load(Yii::$app->request->post()) && $model->save() ) {
-            Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug created'));
+        $service = $this->module->getUrlService();
+        if($model->load(Yii::$app->request->post()) && $model->validate() ) {
+            $service->createSlug($model);
+            //Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug created'));
         }
         
         if($model->hasErrors()) {
@@ -44,10 +45,13 @@ class SlugController extends \yii\web\Controller {
     }
     
     public function actionCreate() {
+        $service = $this->module->getUrlService();
+        
         $model = new PmSlugs();
         
-        if($model->load(Yii::$app->request->post()) && $model->save() ) {
-            Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug created'));
+        if($model->load(Yii::$app->request->post()) && $model->validate() ) {
+            $service->createSlug($model);
+            //Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug created'));
         }
         
         if($model->hasErrors()) {
@@ -59,6 +63,14 @@ class SlugController extends \yii\web\Controller {
         return $this->render('create', [
             'model' => $model
         ]);
+    }
+    
+    public function actionDelete($id) {
+        $service = $this->module->getUrlService();
+        $model = $this->findModel($id);
+        $service->deleteSlug($model);
+        Yii::$app->session->setFlash('success', Yii::t('pm', 'Slug deleted'));
+        return $this->redirect(Yii::$app->request->referrer);
     }
     
     private function findModel($id) {

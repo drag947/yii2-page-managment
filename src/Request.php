@@ -6,6 +6,7 @@ namespace drag947\pm;
 use Yii;
 use drag947\pm\models\PmAlias;
 use drag947\pm\models\PmSlugs;
+use drag947\pm\models\PageManagment;
 
 /**
  * Description of Request
@@ -14,14 +15,51 @@ use drag947\pm\models\PmSlugs;
  */
 class Request extends \yii\web\Request {
     
+    public $page_id;
+    public $page;
     
     public function resolve(): array {
         
         $url = $this->getPathInfo();
-        
-        $page = false;
+        $result = $this->runAlias($url);
+        if(!$result) {
+            $result = Yii::$app->getUrlManager()->parseRequest($this);
+        }
+        $baseUrl = $this->builtUrl($url, $this->getQueryParams());
+        if ($result !== false) {
+            list($route, $params) = $result;
+            
+            $params = $this->replaceSlug($params);
+            if ($this->getQueryParams() === null) {
+                $_GET = $params + $_GET; // preserve numeric keys
+            } else {
+                $this->setQueryParams($params + $this->getQueryParams());
+            }
+           
+            $lastUrl = Yii::$app->getUrlManager()->createUrl(array_merge([0=>$route], $this->replaceSlugReverse($this->getQueryParams()) ));
+            
+            //$result = $this->runAlias($this->builtUrl($route, $this->getQueryParams()));
+            if($lastUrl !== '/'.$baseUrl) {
+                Yii::$app->response->redirect([$lastUrl], 301)->send();
+                die();
+            }
+            $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams());
+            if($page) {
+                $this->page_id = $page->id;
+            }
+            
+            return [$route, $this->getQueryParams()];
+        }
+
+        throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+    }
+    
+    private function runAlias($url) {
+        $result = false;
         $page = PmAlias::find()->where(['route' => $url])->limit(1)->one();
+        //var_dump($page);
         if($page) {
+            $this->page_id = $page->id;
             $alias = PmAlias::find()->with('page')->where(['page_id'=>$page->page_id])->orderBy('sort asc')->limit(1)->one();
             
             if($alias && $alias->route != $url) {
@@ -29,23 +67,8 @@ class Request extends \yii\web\Request {
                 die();
             }
             $result = $this->spreadUrl($alias->page->path);
-        }else{
-            $result = Yii::$app->getUrlManager()->parseRequest($this);
         }
-        
-        if ($result !== false) {
-            list($route, $params) = $result;
-            $params = $this->replaceSlug($params);
-            if ($this->getQueryParams() === null) {
-                $_GET = $params + $_GET; // preserve numeric keys
-            } else {
-                $this->setQueryParams($params + $this->getQueryParams());
-            }
-
-            return [$route, $this->getQueryParams()];
-        }
-
-        throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+        return $result;
     }
     
     private function replaceSlug($params) {
@@ -57,6 +80,18 @@ class Request extends \yii\web\Request {
                 continue;
             }
             $result[$key] = $slug->key;
+        }
+        return $result;
+    }
+    private function replaceSlugReverse($params) {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
+            if(!$slug) {
+                $result[$key] = $value;
+                continue;
+            }
+            $result[$key] = $slug->value;
         }
         return $result;
     }

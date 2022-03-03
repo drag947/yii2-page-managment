@@ -18,8 +18,10 @@ class PmSlugs extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['key', 'value', 'param'], 'required'],
-            [['value', 'param'], 'string', 'max' => 255],
-            [['param'], 'unique', 'targetAttribute' => ['param', 'key']]
+            [['param'], 'string', 'max' => 255],
+            [['value'], 'string', 'max' => 70],
+            [['param'], 'unique', 'targetAttribute' => ['param', 'key']],
+            [['value'], 'unique', 'targetAttribute' => ['param', 'value']]
         ];
     }
     
