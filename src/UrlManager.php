@@ -53,7 +53,8 @@ class UrlManager extends \yii\web\UrlManager {
                 $params = $this->replaceSlugCreate($params);
                 /* @var $rule UrlRule */
                 $rules = $this->rules;
-                sort($rules);
+                krsort($rules);
+                
                 foreach ($rules as $rule) {
                     //if (in_array($rule, $this->_ruleCache[$cacheKey], true)) {
                         // avoid redundant calls of `UrlRule::createUrl()` for rules checked in `getUrlFromCache()`

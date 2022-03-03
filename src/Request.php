@@ -37,11 +37,11 @@ class Request extends \yii\web\Request {
             }
            
             $lastUrl = Yii::$app->getUrlManager()->createUrl(array_merge([0=>$route], $this->replaceSlugReverse($this->getQueryParams()) ));
-            
+            //var_dump($lastUrl, $baseUrl);die();
             //$result = $this->runAlias($this->builtUrl($route, $this->getQueryParams()));
             if($lastUrl !== '/'.$baseUrl) {
-                Yii::$app->response->redirect([$lastUrl], 301)->send();
-                die();
+                //Yii::$app->response->redirect([$lastUrl], 301)->send();
+                //die();
             }
             $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams());
             if($page) {
