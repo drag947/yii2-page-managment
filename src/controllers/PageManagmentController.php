@@ -77,7 +77,7 @@ class PageManagmentController extends Controller {
         $transaction = Yii::$app->db->beginTransaction();
         if($model->load(Yii::$app->request->post())) {
             try {
-                $this->module->getUrlService()->createPage($model->path);
+                $this->module->getUrlService()->createPage($model->route);
                 $transaction->commit();
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
                 return $this->redirect(['index']);
