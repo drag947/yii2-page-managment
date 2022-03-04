@@ -34,6 +34,9 @@ class PageManagment extends ActiveRecord {
     }
     
     public static function findByRouteAndParams($route, $params) {
+        if(!$route) {
+            $route = 'site/index';
+        }
         $routes = PageManagment::find()->with('params')->where(['route' => $route])->all();
         
         if(!$routes) {

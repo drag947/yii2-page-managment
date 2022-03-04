@@ -19,7 +19,7 @@ use drag947\pm\models\PageManagment;
  */
 class PageManagmentSearch extends PageManagment {
     
-    
+    public $path;
     public function rules()
     {
         return [
@@ -48,7 +48,7 @@ class PageManagmentSearch extends PageManagment {
         $query->andFilterWhere([
             'id' => $this->id,
         ]);
-        $query->andFilterWhere(['LIKE', 'path', $this->path]);
+        $query->andFilterWhere(['LIKE', 'route', $this->path]);
 
 
         return $dataProvider;
