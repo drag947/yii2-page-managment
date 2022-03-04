@@ -49,6 +49,9 @@ class PageManagment extends ActiveRecord {
                 return $route;
             }
         }
+        if(!$params) {
+            return current($routes);
+        }
         
         return null;
     }

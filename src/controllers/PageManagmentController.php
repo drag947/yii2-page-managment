@@ -98,7 +98,7 @@ class PageManagmentController extends Controller {
     
     public function actionView($id) {
         $page = $this->findModel($id);
-        if($page->load(Yii::$app->request->post())) {
+        if($page->load(Yii::$app->request->post()) && $page->validate()) {
             if( $page->save() ) {
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Updated!'));
             }else{

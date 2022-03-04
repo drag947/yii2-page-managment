@@ -8,7 +8,7 @@ use rmrevin\yii\fontawesome\FAS;
     <div class="card-body">
         <?= $form->errorSummary($model) ?>
         
-        <?= $form->field($model, 'path')->textInput() ?>
+        <?= $form->field($model, 'route')->textInput() ?>
         
     </div>
     <div class="card-footer">
