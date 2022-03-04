@@ -122,9 +122,9 @@ class PageManagmentController extends Controller {
     
     private function formPage($insert = true) {
         $model = new DynamicModel();
-        $model->defineAttribute('path');
+        $model->defineAttribute('route');
         $model->defineAttribute('isNewRecord', $insert);
-        $model->addRule('path', 'required');
+        $model->addRule('route', 'required');
         return $model;
     }
     
