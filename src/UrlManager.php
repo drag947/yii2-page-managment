@@ -46,11 +46,11 @@ class UrlManager extends \yii\web\UrlManager {
             }
             
             if($url === false) {
+                $params = $this->replaceSlugCreate($params);
                 $url = $this->getUrlFromCache($cacheKey, $route, $params);
             }
             
             if ($url === false) {
-                $params = $this->replaceSlugCreate($params);
                 /* @var $rule UrlRule */
                 $rules = $this->rules;
                 krsort($rules);
