@@ -69,7 +69,13 @@ class UrlService {
                         'key' => $params[$k],
                         'value' => $param
                     ]);
-                    
+                    if(!$slug->validate()) {
+                        $value = $param.$params[$k];
+                        if(strlen($value) > 70) {
+                            $value = substr($param, 0, strlen($param) - strlen($params[$k])).$params[$k];
+                        }
+                        $slug->value = $value;
+                    }
                     $slug->save();
                     if($slug->hasErrors()) {
                         throw new PmException(implode('|', $slug->getFirstErrors()));
@@ -111,10 +117,10 @@ class UrlService {
                 $url = str_replace('<id>', $row[$entity['id']], $entity['url']);
                 try {
                     $this->createPage($url);
+                $i++;
                 } catch (MessageException $e) {
                     
                 }
-                $i++;
             }
         }
         return $i;
