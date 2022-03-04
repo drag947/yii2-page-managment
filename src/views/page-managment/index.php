@@ -13,6 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>
             <?= Html::a(Yii::t('backend', 'Create'), Url::to(['create']), ['class'=>'btn btn-success']) ?>
         </p>
+        <p>
+            <?= Html::a(Yii::t('backend', 'Create possible pages'), Url::to(['create-possible-pages']), ['class'=>'btn btn-success']) ?>
+        </p>
     </div>
     <div class="card-body p-0">
         <?= GridView::widget([

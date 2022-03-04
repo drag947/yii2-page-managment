@@ -11,6 +11,7 @@ use drag947\pm\models\SeoManagment;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use drag947\pm\MessageException;
 /**
  * Description of UrlService
  *
@@ -99,6 +100,28 @@ class UrlService {
     
     public function deletePage() {
         
+    }
+    
+    public function createPossiblePages() {
+        $i = 0;
+        
+        foreach ($this->entities as $name => $entity) {
+            $rows = Yii::$app->db->createCommand("SELECT * FROM ".$entity['table'])->queryAll();
+            foreach ($rows as $row) {
+                $url = str_replace('<id>', $row[$entity['id']], $entity['url']);
+                try {
+                    $this->createPage($url);
+                } catch (MessageException $e) {
+                    
+                }
+                $i++;
+            }
+        }
+        return $i;
+    }
+    
+    public function countPossiblePages() {
+        //return Yii::$app->db->createCommand("SELECT * FROM ")->queryAll();
     }
     
     public function createSlug($model) {

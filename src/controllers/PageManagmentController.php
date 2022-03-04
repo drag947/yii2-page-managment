@@ -25,6 +25,13 @@ use richardfan\sortable\SortableAction;
  */
 class PageManagmentController extends Controller {
     
+    private $service;
+    
+    public function __construct($id, $module, $config = array()) {
+        parent::__construct($id, $module, $config);
+        $this->service = $this->module->getUrlService();
+    }
+    
     public function actions() {
         return [
             'sort-alias' => [
@@ -46,6 +53,23 @@ class PageManagmentController extends Controller {
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel
         ]);
+    }
+    
+    public function actionCreatePossiblePages() {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $count = $this->service->createPossiblePages();
+            $transaction->commit();
+             Yii::$app->session->setFlash('info', 'Create pages count: '.$count);
+        } catch (drag947\pm\MessageException $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
+            $transaction->rollBack();
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+       
+        return $this->redirect(Yii::$app->request->referrer);
     }
     
     public function actionCreate() {
