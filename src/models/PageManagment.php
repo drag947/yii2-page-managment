@@ -42,9 +42,10 @@ class PageManagment extends ActiveRecord {
         if(!$routes) {
             return null;
         }
-        
+        $routesWithoutParams = [];
         foreach ($routes as $route) {
             if(!$route->params) {
+                $routesWithoutParams[] = $route;
                 continue;
             }
             $pageParams = ArrayHelper::map($route->params, 'param', 'value');
@@ -52,8 +53,8 @@ class PageManagment extends ActiveRecord {
                 return $route;
             }
         }
-        if(!$params) {
-            return current($routes);
+        if(!$params && $routesWithoutParams) {
+            return current($routesWithoutParams);
         }
         
         return null;
