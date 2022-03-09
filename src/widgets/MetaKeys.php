@@ -63,7 +63,7 @@ class MetaKeys extends Widget {
     }
     
     private static function getMetaKeys($page_id, $lang) {
-        if(self::$keys !== false) {
+        if(self::$keys === false) {
             $seo = SeoManagment::findOne(['page_id' => $page_id, 'lang' => $lang]);
             $default = SeoManagment::findOne(['is_main' => 1]);
             
