@@ -18,7 +18,6 @@ use drag947\pm\models\PageManagment;
  */
 class SeoManagment extends ActiveRecord {
     
-    public $image = false;
     
     public static function tableName() {
         return '{{%pm_meta_keys}}';
@@ -28,9 +27,12 @@ class SeoManagment extends ActiveRecord {
         return [
             [['page_id'], 'required'],
             [['page_id'], 'integer'],
-            [['h_one', 'title', 'description'], 'string', 'max'=>255],
+            [['h_one', 'title', 'description', 'image'], 'string', 'max'=>255],
             [['keywords', 'text'], 'string'],
-            [['lang'], 'string', 'max'=>10]
+            [['lang'], 'string', 'max'=>10],
+            ['image', 'url', 'defaultScheme' => 'https'],
+            [['id', 'lang'], 'unique', 'targetAttribute' => 'id'],
+            ['is_main', 'boolean']
         ];
     }
     

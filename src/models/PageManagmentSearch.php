@@ -18,7 +18,7 @@ use drag947\pm\models\PageManagment;
  * @author ilya
  */
 class PageManagmentSearch extends PageManagment {
-    
+    public $service;
     public $path;
     public function rules()
     {

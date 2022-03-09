@@ -14,6 +14,8 @@ use drag947\pm\models\PageManagment;
 use drag947\pm\models\PmAlias;
 use yii\helpers\Url;
 use yii\base\Widget;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 /**
  * Description of MetaKeys
@@ -22,22 +24,60 @@ use yii\base\Widget;
  */
 class MetaKeys extends Widget {
     
+    private static $keys = false;
+    
+    public function init() {
+        parent::init();
+    }
     
     public function run() {
-        $object = $this;
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
         if($page_id) {
-            $keys = $object->getMetaKeys($page_id, $lang);
+            $keys = self::getMetaKeys($page_id, $lang);
             if($keys) {
-                return $object->getOpenGraph($keys, $lang);
+                return $this->getOpenGraph($keys, $lang);
             }
         }
+        return '';
     }
     
-    private function getMetaKeys($page_id, $lang) {
-        $keys = SeoManagment::findOne(['page_id' => $page_id, 'lang' => $lang]);
-        return $keys;
+    public static function getHOne() {
+        $page_id = Yii::$app->request->page_id;
+        $lang = Yii::$app->language;
+        $keys = self::getMetaKeys($page_id, $lang);
+        if($keys && $keys['h_one']) {
+            return Html::encode($keys['h_one']);
+        }
+        return '';
+    }
+    
+    public static function getSeoText() {
+        $page_id = Yii::$app->request->page_id;
+        $lang = Yii::$app->language;
+        $keys = self::getMetaKeys($page_id, $lang);
+        if($keys && $keys['text']) {
+            return HtmlPurifier::process($keys['text']);
+        }
+        return '';
+    }
+    
+    private static function getMetaKeys($page_id, $lang) {
+        if(self::$keys !== false) {
+            $seo = SeoManagment::findOne(['page_id' => $page_id, 'lang' => $lang]);
+            $default = SeoManagment::findOne(['is_main' => 1]);
+            
+            if($seo && $default) {
+                foreach ($seo as $key => $value) {
+                    if(!$value) {
+                        $seo[$key] = $default[$key];
+                    }
+                }
+            }
+            
+            self::$keys = $seo;
+        }
+        return self::$keys;
     }
     /* переделать под url-manager искать по реальному url */
     private function getPageId($url, $params = '') {
@@ -62,16 +102,16 @@ class MetaKeys extends Widget {
         $meta .= '<meta property = "og:locale" content = "'.$lang.'" />';
         if($keys->title) {
             $meta .= '<title>'.$keys->title.'</title>';
-            $meta .= '<meta property="og:title" content="'.$keys->title.'" />';
+            $meta .= '<meta property="og:title" content="'.Html::encode($keys->title).'" />';
         }
         if($keys->image) {
             $meta .= '<meta property = "og:image" content = "'.$keys->image.'" />';
         }
         if($keys->description) {
-            $meta .= '<meta property = "og:description" content = "'.$keys->description.'" />';
+            $meta .= '<meta property = "og:description" content = "'.Html::encode($keys->description).'" />';
         }
         if($keys->keywords) {
-            $meta .= '<meta name = "keywords" content = "'.$keys->keywords.'" />';
+            $meta .= '<meta name = "keywords" content = "'.Html::encode($keys->keywords).'" />';
         }
         return $meta;
     }

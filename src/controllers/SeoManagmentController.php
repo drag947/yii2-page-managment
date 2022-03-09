@@ -63,6 +63,7 @@ class SeoManagmentController extends Controller {
         }
         
         if( $model->load(Yii::$app->request->post()) ) {
+            
             if($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Meta tags updated!'));
                 if(Yii::$app->request->referrer) {

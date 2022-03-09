@@ -16,7 +16,6 @@ use drag947\pm\models\PageManagment;
 class Request extends \yii\web\Request {
     
     public $page_id;
-    public $page;
     
     public function resolve(): array {
         

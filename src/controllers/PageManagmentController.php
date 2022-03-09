@@ -43,7 +43,9 @@ class PageManagmentController extends Controller {
     }
     
     public function actionIndex() {
-        $searchModel = new PageManagmentSearch();
+        $searchModel = new PageManagmentSearch([
+            'service' => $this->service
+        ]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->sort = [
             'defaultOrder' => ['id' => SORT_DESC],

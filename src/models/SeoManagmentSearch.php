@@ -19,6 +19,7 @@ use drag947\pm\models\SeoManagment;
  */
 class SeoManagmentSearch extends SeoManagment {
     
+    public $service;
     
     public function rules()
     {
