@@ -22,7 +22,9 @@ class UrlService {
      * [
      *  'name_entity' => [
      *          'class' => ActiveRecord,
-     *          'field' => string
+     *          'field' => string,
+     * 'id',
+     * 'url'
      *      ]
      * ]
      */
@@ -236,7 +238,11 @@ class UrlService {
             if(!$slug) {
                 if($this->hasEntity($key)) {
                     $entity = $this->getEntity($key);
-                    $result[$key] = $this->autoSlug($entity, $value);
+                    if($entity['field']) {
+                        $result[$key] = $this->autoSlug($entity, $value);
+                    }else{
+                        $result[$key] = $value;
+                    }
                     continue;
                 }
                 $result[$key] = $value;
@@ -252,7 +258,7 @@ class UrlService {
         if(!$name) {
             return $key;
         }
-        return substr(Inflector::slug($name[$entity['field']]), 0, 70);
+        return trim(substr(Inflector::slug($name[$entity['field']]), 0, 70), '-');
         //return Inflector::slug($entity['class']::find()->where([$entity['id'] => $value])->limit(1)->one()[$entity['field']]);
     }
     
