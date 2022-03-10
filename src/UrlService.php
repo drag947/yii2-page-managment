@@ -66,6 +66,9 @@ class UrlService {
         if($newParams !== $params) {
             foreach ($newParams as $k => $param) {
                 if($param !== $params[$k]) {
+                    if(PmSlugs::findOne(['param' => $k,'key' => $params[$k],'value' => $param])) {
+                        continue;
+                    }
                     $slug = new PmSlugs([
                         'param' => $k,
                         'key' => $params[$k],
@@ -184,7 +187,7 @@ class UrlService {
         }])->where(['param' => $param])->andWhere(['value' => $key])->all();
     }
     
-    private function findRealUrlPage($path) {
+    public function findRealUrlPage($path) {
         $alias = PmAlias::find()->where(['route' => $path])->limit(1)->one();
         if($alias) {
             $result = [$alias->page->route, $alias->page->params];
@@ -229,8 +232,8 @@ class UrlService {
         }
         return $alia;
     }
-    
-    private function replaceSlug($params) {
+    // заменяет реальное значение на слаг
+    public function replaceSlug($params) {
         $result = [];
         foreach ($params as $key => $value) {
             $slug = PmSlugs::findOne(['key' => $value, 'param' => $key]);
@@ -249,6 +252,19 @@ class UrlService {
                 continue;
             }
             $result[$key] = $slug->value;
+        }
+        return $result;
+    }
+    // заменяет слаг на реальное значение
+    public function replaceSlugReverse($params) {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $slug = PmSlugs::findOne(['value' => $value, 'param' => $key]);
+            if(!$slug) {
+                $result[$key] = $value;
+                continue;
+            }
+            $result[$key] = $slug->key;
         }
         return $result;
     }
@@ -288,12 +304,5 @@ class UrlService {
         }
        
         return [$route, $params];
-    }
-}
-
-class Test {
-    
-    public function getPathInfo() {
-        
     }
 }

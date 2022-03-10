@@ -32,7 +32,22 @@ class SeoManagment extends ActiveRecord {
             [['lang'], 'string', 'max'=>10],
             ['image', 'url', 'defaultScheme' => 'https'],
             [['id', 'lang'], 'unique', 'targetAttribute' => 'id'],
-            ['is_main', 'boolean']
+            ['is_main', 'boolean'],
+            ['is_main', 'default', 'value' => 0]
+        ];
+    }
+    
+    public function attributeLabels() {
+        return [
+            'page_id' => Yii::t('pm', 'Page ID'),
+            'h_one' => Yii::t('pm', 'h1'),
+            'title' => Yii::t('pm', 'Title'),
+            'description' => Yii::t('pm', 'Description'),
+            'image' => Yii::t('pm', 'Image'),
+            'keywords' => Yii::t('pm', 'Keywords'),
+            'text' => Yii::t('pm', 'SEO Text'),
+            'lang' => Yii::t('pm', 'Lang'),
+            'is_main' => Yii::t('pm', 'Default value')
         ];
     }
     

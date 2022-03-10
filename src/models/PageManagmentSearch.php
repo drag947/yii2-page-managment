@@ -24,10 +24,16 @@ class PageManagmentSearch extends PageManagment {
     {
         return [
             [['id'], 'integer'],
-            [['path'], 'string', 'max'=>255]
+            [['path'], 'string', 'max'=>255],
+            ['path', 'trim']
         ];
     }
-
+    
+    public function attributeLabels() {
+        return [
+            'path' => Yii::t('pm', 'Path')
+        ];
+    }
 
     /**
      * Creates data provider instance with search query applied
@@ -35,7 +41,7 @@ class PageManagmentSearch extends PageManagment {
      */
     public function search($params)
     {
-        $query = PageManagment::find();
+        $query = PageManagment::find()->alias('pm');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -46,10 +52,24 @@ class PageManagmentSearch extends PageManagment {
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
+            'pm.id' => $this->id,
         ]);
-        $query->andFilterWhere(['LIKE', 'route', $this->path]);
-
+        
+        $service = Yii::$app->controller->module->getUrlService();
+        
+        list($route, $params) = $service->findRealUrlPage($this->path);
+        if($route) {
+            $query->andFilterWhere(['LIKE', 'pm.route', $route]);
+        }
+        
+        if($params) {
+            $query->leftJoin(PageParams::tableName().' as pp', 'pm.id = pp.page_id');
+            $params = $service->replaceSlugReverse($params);
+            
+            foreach ($params as $param => $value) {
+                $query->andFilterWhere(['pp.param' => $param, 'pp.value' => $value]);
+            }
+        }
 
         return $dataProvider;
     }

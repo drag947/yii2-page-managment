@@ -22,6 +22,13 @@ class PageParams extends \yii\db\ActiveRecord {
         ];
     }
     
+    public function attributeLabels() {
+        return [
+            'page_id' => Yii::t('pm', 'Page ID'),
+            'param' => Yii::t('pm', 'Param'),
+        ];
+    }
+    
     public function getPage() {
         return $this->hasOne(PageManagment::class, ['id' => 'page_id']);
     }

@@ -12,9 +12,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="card-header">
         <p>
             <?= Html::a(Yii::t('backend', 'Create'), Url::to(['create']), ['class'=>'btn btn-success']) ?>
-        </p>
-        <p>
-            <?= Html::a(Yii::t('backend', 'Create possible pages'), Url::to(['create-possible-pages']), ['class'=>'btn btn-success']) ?>
+        
+            <?= Html::a(Yii::t('pm', 'Create possible pages'), Url::to(['create-possible-pages']), ['class'=>'btn btn-success']) ?>
         </p>
     </div>
     <div class="card-body p-0">
@@ -35,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'path',
                     'options' => ['style' => 'width: 5%'],
+                    'label' => Yii::t('pm', 'Path')
                 ],
                 [
                     'class' => \common\widgets\ActionColumn::class,

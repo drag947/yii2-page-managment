@@ -33,6 +33,12 @@ class PageManagment extends ActiveRecord {
         ];
     }
     
+    public function attributeLabels() {
+        return [
+            'route' => Yii::t('pm', 'Route')
+        ];
+    }
+    
     public static function findByRouteAndParams($route, $params) {
         if(!$route) {
             $route = 'site/index';

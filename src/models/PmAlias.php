@@ -34,6 +34,15 @@ class PmAlias extends ActiveRecord {
         ];
     }
     
+    public function attributeLabels() {
+        return [
+            'page_id' => Yii::t('pm', 'Page ID'),
+            'sort' => Yii::t('pm', 'Sort'),
+            'url' => Yii::t('pm', 'Url'),
+            'route' => Yii::t('pm', 'Route')
+        ];
+    }
+    
     public function getPage() {
         return $this->hasOne(PageManagment::class, ['id'=>'page_id']);
     }
