@@ -26,7 +26,7 @@ use trntv\filekit\widget\Upload;
         
         <?= $form->field($model, 'text')->widget(Widget::class,
             [
-                'plugins' => ['fullscreen', 'fontcolor', 'video'],
+                'plugins' => ['fullscreen', 'fontcolor', 'video', 'fontsize', 'fontfamily'],
                 'options' => [
                     'minHeight' => 400,
                     'maxHeight' => 400,
