@@ -109,6 +109,7 @@ class MetaKeys extends Widget {
         }
         if($keys->description) {
             $meta .= '<meta property = "og:description" content = "'.Html::encode($keys->description).'" />';
+            $meta .= '<meta name="description" content="'.Html::encode($keys->description).'">';
         }
         if($keys->keywords) {
             $meta .= '<meta name = "keywords" content = "'.Html::encode($keys->keywords).'" />';
