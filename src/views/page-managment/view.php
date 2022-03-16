@@ -16,9 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <li class="nav-item">
       <a class="nav-link <?= $type == 'meta_tags' ? 'active' : ''?>" href="<?=Url::to(['page-managment/meta-tags', 'id'=>$page->id])?>"><?=Yii::t('backend', 'Meta tags')?></a>
     </li>
+    <?php if (!$page->is_group) : ?>
     <li class="nav-item">
       <a class="nav-link <?= $type == 'alias' ? 'active' : ''?>" href="<?=Url::to(['page-managment/alias', 'id'=>$page->id])?>"><?=Yii::t('backend', 'Alias')?></a>
     </li>
+    <?php endif;?>
 </ul>
 
 <div class="tab-content">  
@@ -26,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="tab-pane show active">
             <?php echo $this->render('_form', [
                 'model' => $page,
+                'groups' => $groups
             ]) ?>
         </div>
     <?php elseif($type == 'meta_tags') : ?>

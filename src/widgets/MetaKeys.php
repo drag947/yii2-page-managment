@@ -25,16 +25,18 @@ use yii\helpers\HtmlPurifier;
 class MetaKeys extends Widget {
     
     private static $keys = false;
+    public $params = [];
     
     public function init() {
         parent::init();
+        
     }
     
     public function run() {
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
         if($page_id) {
-            $keys = self::getMetaKeys($page_id, $lang);
+            $keys = self::getMetaKeys($page_id, $lang, Yii::$app->request->page->group_id, $this->params);
             if($keys) {
                 return $this->getOpenGraph($keys, $lang);
             }
@@ -45,7 +47,8 @@ class MetaKeys extends Widget {
     public static function getHOne() {
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
-        $keys = self::getMetaKeys($page_id, $lang);
+        $params = isset(Yii::$app->view->params['seo']) ? Yii::$app->view->params['seo'] : [];
+        $keys = self::getMetaKeys($page_id, $lang, Yii::$app->request->page->group_id, $params);
         if($keys && $keys['h_one']) {
             return Html::encode($keys['h_one']);
         }
@@ -55,25 +58,68 @@ class MetaKeys extends Widget {
     public static function getSeoText() {
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
-        $keys = self::getMetaKeys($page_id, $lang);
+        $params = isset(Yii::$app->view->params['seo']) ? Yii::$app->view->params['seo'] : [];
+        $keys = self::getMetaKeys($page_id, $lang,Yii::$app->request->page->group_id, $params);
         if($keys && $keys['text']) {
             return HtmlPurifier::process($keys['text']);
         }
         return '';
     }
     
-    private static function getMetaKeys($page_id, $lang) {
+    private static function isEmpty($keys) {
+        if(!$keys) {
+            return true;
+        }
+        $keys = array_values($keys->getAttributes(['title', 'description', 'image', 'keywords', 'h_one']));
+        foreach ($keys as $key) {
+            if($key) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private static function getMetaKeys($page_id, $lang, $group_id, $params = []) {
+        $seo = [];
         if(self::$keys === false) {
             $seo = SeoManagment::findOne(['page_id' => $page_id, 'lang' => $lang]);
-            $default = SeoManagment::findOne(['is_main' => 1]);
             
-            if($seo && $default) {
+            if(self::isEmpty($seo) && $group_id) {
+                $seo = SeoManagment::findOne(['page_id' => $group_id, 'lang' => $lang]);
+            }
+            if(self::isEmpty($seo)) {
+                $seo = SeoManagment::findOne(['is_main' => 1]);
+            }
+            
+            if($seo && $params) {
+                $search = [];
+                foreach ($params as $key => $param) {
+                   $search['<'.$key.'>'] = $param; 
+                }
+                
+                if($search) {
+                    $keys = array_keys($search);
+                    $seo->title = str_replace($keys, $search, $seo->title);
+                    $seo->description = str_replace($keys, $search, $seo->description);
+                    $seo->keywords = str_replace($keys, $search, $seo->keywords);
+                    $seo->h_one = str_replace($keys, $search, $seo->h_one);
+                }
+            }
+            //$group = SeoManagment::findOne(['page_id' => $group_id, 'lang' => $lang]);
+            //$default = SeoManagment::findOne(['is_main' => 1]);
+            /*if($seo && $group) {
+                foreach ($seo as $key => $value) {
+                    if(!$value) {
+                        $seo[$key] = $group[$key];
+                    }
+                }
+            }elseif($seo && $default) {
                 foreach ($seo as $key => $value) {
                     if(!$value) {
                         $seo[$key] = $default[$key];
                     }
                 }
-            }
+            }*/
             
             self::$keys = $seo;
         }

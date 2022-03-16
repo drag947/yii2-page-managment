@@ -41,7 +41,7 @@ class PageManagmentSearch extends PageManagment {
      */
     public function search($params)
     {
-        $query = PageManagment::find()->alias('pm');
+        $query = PageManagment::find()->where(['is_group' => 0])->alias('pm');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

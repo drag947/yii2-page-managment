@@ -16,6 +16,7 @@ use drag947\pm\models\PageManagment;
 class Request extends \yii\web\Request {
     
     public $page_id;
+    public $page;
     
     public function resolve(): array {
         
@@ -45,6 +46,7 @@ class Request extends \yii\web\Request {
             $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams());
             if($page) {
                 $this->page_id = $page->id;
+                $this->page = $page;
             }
             
             return [$route, $this->getQueryParams()];

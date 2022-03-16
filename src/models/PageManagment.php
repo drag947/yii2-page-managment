@@ -29,7 +29,11 @@ class PageManagment extends ActiveRecord {
     public function rules() {
         return [
             [['route'], 'required'],
-            [['route'], 'string', 'max'=>255]
+            [['route'], 'string', 'max'=>255],
+            [['group_id'], 'integer'],
+            ['group_id', 'exist', 'targetAttribute' => 'id'],
+            [['is_group'], 'boolean'],
+            ['is_group', 'default', 'value' => 0]
         ];
     }
     
@@ -43,7 +47,7 @@ class PageManagment extends ActiveRecord {
         if(!$route) {
             $route = 'site/index';
         }
-        $routes = PageManagment::find()->with('params')->where(['route' => $route])->all();
+        $routes = PageManagment::find()->with('params')->where(['route' => $route, 'is_group' => 0])->all();
         
         if(!$routes) {
             return null;
@@ -79,6 +83,10 @@ class PageManagment extends ActiveRecord {
             $this->full_url = UrlService::builtUrl($this->route, ArrayHelper::map($this->params, 'param', 'value') );
         }
         return $this->full_url;
+    }
+    
+    public function getGroup() {
+        return $this->hasOne(self::class, ['id' => 'group_id']);
     }
     
 }

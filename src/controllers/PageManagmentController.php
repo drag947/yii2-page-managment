@@ -51,9 +51,14 @@ class PageManagmentController extends Controller {
             'defaultOrder' => ['id' => SORT_DESC],
         ];
         
+        $dataGroup = new ActiveDataProvider([
+            'query' => PageManagment::find()->where(['is_group' => 1])
+        ]);
+        
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
+            'searchModel' => $searchModel,
+            'dataGroup' => $dataGroup
         ]);
     }
     
@@ -94,6 +99,31 @@ class PageManagmentController extends Controller {
         }
         
         return $this->render('create', [
+            'model' => $model,
+            'groups' => $this->module->getUrlService()->getGroups()
+        ]);
+    }
+    
+    public function actionCreateGroup() {
+        $model = $this->formGroup();
+        
+        if($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $mod = new PageManagment([
+                'route' => $model->label,
+                'is_group' => 1
+            ]);
+            $seo = new SeoManagment();
+            $seo->lang = Yii::$app->language;
+            
+            if( $mod->save() ) {
+                $seo->page_id = $mod->id;
+                $seo->save();
+                Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
+                return $this->redirect(['index']);
+            }
+        }
+        
+        return $this->render('group', [
             'model' => $model
         ]);
     }
@@ -111,21 +141,33 @@ class PageManagmentController extends Controller {
         return $this->render('view', [
             'page' => $page,
             'type' => 'page',
+            'groups' => $this->module->getUrlService()->getGroups(),
             'realPage' => ''
         ]);
     }
     
     public function actionDelete($id) {
         $page = $this->findModel($id);
-        $page->delete();
+        if($page->delete() && $page->is_group) {
+            PageManagment::updateAll(['group_id' => null], ['group_id' => $id]);
+        }
         Yii::$app->session->setFlash('success', Yii::t('backend', 'Delete!'));
         return $this->redirect(Yii::$app->request->referrer);
+    }
+    
+    private function formGroup($insert = true) {
+        $model = new DynamicModel();
+        $model->defineAttribute('label');
+        $model->defineAttribute('isNewRecord', $insert);
+        $model->addRule('label', 'required');
+        return $model;
     }
     
     private function formPage($insert = true) {
         $model = new DynamicModel();
         $model->defineAttribute('route');
         $model->defineAttribute('isNewRecord', $insert);
+        $model->defineAttribute('group_id');
         $model->addRule('route', 'required');
         return $model;
     }

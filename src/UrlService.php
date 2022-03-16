@@ -42,8 +42,11 @@ class UrlService {
         $this->entities = $entities;
     }
     
+    public function getGroups() {
+        return PageManagment::findAll(['is_group' => 1]);
+    }
     
-    public function createPage(string $path) {
+    public function createPage(string $path, $group_id) {
         
         list($route, $params) = $this->findRealUrlPage($path);
         
@@ -53,6 +56,7 @@ class UrlService {
         
         $page = new PageManagment();
         $page->route = $route;
+        $page->group_id = $group_id;
         $seo = new SeoManagment();
         $seo->lang = Yii::$app->language;
         
@@ -104,6 +108,7 @@ class UrlService {
             }
         }    
     }
+    
     
     public function updatePage() {
         
