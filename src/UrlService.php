@@ -46,7 +46,7 @@ class UrlService {
         return PageManagment::findAll(['is_group' => 1]);
     }
     
-    public function createPage(string $path, $group_id) {
+    public function createPage(string $path, $group_id = null) {
         
         list($route, $params) = $this->findRealUrlPage($path);
         

@@ -47,8 +47,9 @@ class MetaKeys extends Widget {
     public static function getHOne() {
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
+        $group_id = Yii::$app->request->page ? Yii::$app->request->page->group_id : false;
         $params = isset(Yii::$app->view->params['seo']) ? Yii::$app->view->params['seo'] : [];
-        $keys = self::getMetaKeys($page_id, $lang, Yii::$app->request->page->group_id, $params);
+        $keys = self::getMetaKeys($page_id, $lang, $group_id, $params);
         if($keys && $keys['h_one']) {
             return Html::encode($keys['h_one']);
         }
@@ -59,7 +60,8 @@ class MetaKeys extends Widget {
         $page_id = Yii::$app->request->page_id;
         $lang = Yii::$app->language;
         $params = isset(Yii::$app->view->params['seo']) ? Yii::$app->view->params['seo'] : [];
-        $keys = self::getMetaKeys($page_id, $lang,Yii::$app->request->page->group_id, $params);
+        $group_id = Yii::$app->request->page ? Yii::$app->request->page->group_id : false;
+        $keys = self::getMetaKeys($page_id, $lang, $group_id, $params);
         if($keys && $keys['text']) {
             return HtmlPurifier::process($keys['text']);
         }
