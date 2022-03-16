@@ -27,6 +27,9 @@ $this->params['breadcrumbs'][] = $this->title;
         
         <?= $form->field($model, 'label')->textInput() ?>
         
+        <?php foreach ($pages as $page) : ?>
+            <?= $form->field($model, 'page_'.$page->id)->checkbox()->label($page->path)?>
+        <?php endforeach; ?>
     </div>
     <div class="card-footer">
         <?php echo Html::submitButton(

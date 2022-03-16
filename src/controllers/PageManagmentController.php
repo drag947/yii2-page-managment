@@ -105,26 +105,57 @@ class PageManagmentController extends Controller {
     }
     
     public function actionCreateGroup() {
-        $model = $this->formGroup();
+        $pages = [];
+        $pagesModel = PageManagment::findAll(['group_id' => null, 'is_group' => 0]);
+        foreach ($pagesModel as $pageModel) {
+            $pages[$pageModel->id] = false; 
+        }
+        $model = $this->formGroup(true, $pages);
         
         if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $mod = new PageManagment([
-                'route' => $model->label,
-                'is_group' => 1
-            ]);
-            $seo = new SeoManagment();
-            $seo->lang = Yii::$app->language;
-            
-            if( $mod->save() ) {
-                $seo->page_id = $mod->id;
-                $seo->save();
-                Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
-                return $this->redirect(['index']);
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $mod = new PageManagment([
+                    'route' => $model->label,
+                    'is_group' => 1
+                ]);
+                $seo = new SeoManagment();
+                $seo->lang = Yii::$app->language;
+
+                if( $mod->save() ) {
+                    $seo->page_id = $mod->id;
+                    if(!$seo->save()) {
+                        $transaction->rollBack();
+                    }
+                    $ids = [];
+                    foreach ($model->attributes as $key => $attr) {
+                        if(strpos($key, 'page_') !== 0) {
+                            continue;
+                        }
+                        if($attr) {
+                            $id = explode('_', $key);
+                            $ids[] = (int)$id[1];
+                        }
+                    }
+                    
+                    if($ids) {
+                        PageManagment::updateAll(['group_id' => $mod->id], ['in', 'id', $ids]);
+                    }
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', Yii::t('backend', 'Page created!'));
+                    return $this->redirect(['index']);
+                }else{
+                    $transaction->rollBack();
+                }
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
             }
         }
         
         return $this->render('group', [
-            'model' => $model
+            'model' => $model,
+            'pages' => $pagesModel 
         ]);
     }
     
@@ -155,10 +186,14 @@ class PageManagmentController extends Controller {
         return $this->redirect(Yii::$app->request->referrer);
     }
     
-    private function formGroup($insert = true) {
+    private function formGroup($insert = true, $pages = []) {
         $model = new DynamicModel();
         $model->defineAttribute('label');
         $model->defineAttribute('isNewRecord', $insert);
+        foreach ($pages as $page_id => $page) {
+            $model->defineAttribute('page_'.$page_id, $page);
+            $model->addRule('page_'.$page_id, 'boolean');
+        }
         $model->addRule('label', 'required');
         return $model;
     }
