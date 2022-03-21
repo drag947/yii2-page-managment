@@ -203,6 +203,7 @@ class PageManagmentController extends Controller {
         $model->defineAttribute('route');
         $model->defineAttribute('isNewRecord', $insert);
         $model->defineAttribute('group_id');
+        $model->defineAttribute('is_group');
         $model->addRule('route', 'required');
         return $model;
     }
