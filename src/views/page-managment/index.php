@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>
             <?= Html::a(Yii::t('backend', 'Create'), Url::to(['create']), ['class'=>'btn btn-success']) ?>
             
-            <?= Html::a(Yii::t('backend', 'Create group'), Url::to(['create-group']), ['class'=>'btn btn-success']) ?>
+            <?= Html::a(Yii::t('pm', 'Create group'), Url::to(['create-group']), ['class'=>'btn btn-success']) ?>
         
             <?= Html::a(Yii::t('pm', 'Create possible pages'), Url::to(['create-possible-pages']), ['class'=>'btn btn-info']) ?>
         </p>
@@ -44,6 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => Yii::t('pm', 'Group'),
                     'value' => function ($data) {
                         return $data->group ? $data->group->route : '';
+                    }
+                ],
+                [
+                    'attribute' => 'is_active',
+                    'options' => ['style' => 'width: 5%'],
+                    'label' => Yii::t('pm', 'Active'),
+                    'value' => function ($data) {
+                        return $data->is_active ? Yii::t('yii', 'Yes') : Yii::t('yii', 'No');
                     }
                 ],
                 [

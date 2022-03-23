@@ -35,6 +35,9 @@ class UrlService {
     }
     
     private function getEntity($key) {
+        if(!isset($this->entities[$key])) {
+            throw new \Exception('entity not found: '.$key);
+        }
         return $this->entities[$key];
     }
     
@@ -46,17 +49,18 @@ class UrlService {
         return PageManagment::findAll(['is_group' => 1]);
     }
     
-    public function createPage(string $path, $group_id = null) {
+    public function createPage(string $path, $group_id = null, $is_active = 1) {
         
         list($route, $params) = $this->findRealUrlPage($path);
         
         if(!$this->isUniquePage($route, $params)) {
-            throw new MessageException('Страница с таким url уже создана');
+            throw new MessageException('Страница с таким url уже создана: '.$path);
         }
         
         $page = new PageManagment();
         $page->route = $route;
         $page->group_id = $group_id;
+        $page->is_active = $is_active;
         $seo = new SeoManagment();
         $seo->lang = Yii::$app->language;
         
@@ -109,13 +113,113 @@ class UrlService {
         }    
     }
     
-    
-    public function updatePage() {
-        
+    public function observerCreate($event) {
+        try {
+            if(!is_array($event->key)) {
+                $keys = [$event->key];
+                $ids = [$event->id];
+            }else{
+                $keys = $event->key;
+                $ids = $event->id;
+            }
+            foreach ($keys as $k => $key) {
+                $entity = $this->getEntity($key);
+                $url = str_replace('<id>', $ids[$k], $entity['url']);
+                $this->createPage($url, null, $event->is_active);
+            }
+        } catch (\Exception $ex) {
+            Yii::error($ex, 'pm');
+        }
     }
     
-    public function deletePage() {
+    public function observerDelete($event) {
         
+        try {
+            if(!is_array($event->key)) {
+                $keys = [$event->key];
+                $ids = [$event->id];
+            }else{
+                $keys = $event->key;
+                $ids = $event->id;
+            }
+            foreach ($keys as $k => $key) {
+                $entity = $this->getEntity($key);
+                $url = str_replace('<id>', $ids[$k], $entity['url']);
+                $this->deletePage($url);
+            }
+        } catch (\Exception $ex) {
+            Yii::error($ex->getMessage(), 'pm');
+        }
+    }
+    
+    public function observerPublish($event) {
+        try {
+            if(!is_array($event->key)) {
+                $keys = [$event->key];
+                $ids = [$event->id];
+            }else{
+                $keys = $event->key;
+                $ids = $event->id;
+            }
+            foreach ($keys as $k => $key) {
+                $entity = $this->getEntity($key);
+                $url = str_replace('<id>', $ids[$k], $entity['url']);
+                $this->updatePage($url, [
+                    'is_active' => 1
+                ]);
+            }
+        } catch (\Exception $ex) {
+            Yii::error($ex->getMessage(), 'pm');
+        }
+    }
+    
+    public function observerUnpublish($event) {
+        try {
+            if(!is_array($event->key)) {
+                $keys = [$event->key];
+                $ids = [$event->id];
+            }else{
+                $keys = $event->key;
+                $ids = $event->id;
+            }
+            foreach ($keys as $k => $key) {
+                $entity = $this->getEntity($key);
+                $url = str_replace('<id>', $ids[$k], $entity['url']);
+                $this->updatePage($url, [
+                    'is_active' => 0
+                ]);
+            }
+        } catch (\Exception $ex) {
+            Yii::error($ex->getMessage(), 'pm');
+        }
+    }
+    
+    public function updatePage($path, $params) {
+        $page = $this->findModel($path);
+        foreach ($params as $field => $value) {
+            if($field === 'is_active') {
+                $page->is_active = $value;
+            }
+        }
+        $result = $page->save();
+        if($page->hasErrors()) {
+            throw new \Exception(implode('|', $page->getFirstErrors()));
+        }
+        return $result;
+    }
+    
+    public function deletePage($path) {
+        $page = $this->findModel($path);
+        $page->delete();
+    }
+    
+    private function findModel($path) {
+        list($route, $params) = $this->findRealUrlPage($path);
+        $page = PageManagment::findByRouteAndParams($route, $params);
+        if(!$page) {
+            throw new \Exception('page not found :'.$path);
+        }
+        return $page;
     }
     
     public function createPossiblePages() {

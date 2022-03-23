@@ -43,7 +43,7 @@ class Request extends \yii\web\Request {
                 Yii::$app->response->redirect([$lastUrl], 301)->send();
                 die();
             }
-            $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams());
+            $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams(), ['is_active' => 1]);
             if($page) {
                 $this->page_id = $page->id;
                 $this->page = $page;

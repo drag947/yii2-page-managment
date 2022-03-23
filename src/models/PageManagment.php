@@ -43,12 +43,15 @@ class PageManagment extends ActiveRecord {
         ];
     }
     
-    public static function findByRouteAndParams($route, $params) {
+    public static function findByRouteAndParams($route, $params, $config = []) {
         if(!$route) {
             $route = 'site/index';
         }
-        $routes = PageManagment::find()->with('params')->where(['route' => $route, 'is_group' => 0])->all();
-        
+        $routes = PageManagment::find()->with('params')->where(['route' => $route, 'is_group' => 0]);
+        if(isset($config['is_active'])) {
+            $routes->andWhere(['is_active' => $config['is_active']]);
+        }
+        $routes = $routes->all();
         if(!$routes) {
             return null;
         }
