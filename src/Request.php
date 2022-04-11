@@ -39,7 +39,7 @@ class Request extends \yii\web\Request {
             $lastUrl = Yii::$app->getUrlManager()->createUrl(array_merge([0=>$route], $this->getQueryParams() ));
             //var_dump(array_merge([0=>$route], $this->getQueryParams()));die();
             //$result = $this->runAlias($this->builtUrl($route, $this->getQueryParams()));
-            if($lastUrl !== '/'.$baseUrl) {
+            if(!$this->isAjax && $lastUrl !== '/'.$baseUrl) {
                 Yii::$app->response->redirect([$lastUrl], 301)->send();
                 die();
             }
