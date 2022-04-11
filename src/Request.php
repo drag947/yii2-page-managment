@@ -36,13 +36,14 @@ class Request extends \yii\web\Request {
                 $this->setQueryParams($params + $this->getQueryParams());
             }
            
-            $lastUrl = Yii::$app->getUrlManager()->createUrl(array_merge([0=>$route], $this->replaceSlugReverse($this->getQueryParams()) ));
-            //var_dump($lastUrl, $baseUrl);die();
+            $lastUrl = Yii::$app->getUrlManager()->createUrl(array_merge([0=>$route], $this->getQueryParams() ));
+            //var_dump(array_merge([0=>$route], $this->getQueryParams()));die();
             //$result = $this->runAlias($this->builtUrl($route, $this->getQueryParams()));
             if($lastUrl !== '/'.$baseUrl) {
                 Yii::$app->response->redirect([$lastUrl], 301)->send();
                 die();
             }
+            
             $page = PageManagment::findByRouteAndParams($route, $this->getQueryParams(), ['is_active' => 1]);
             if($page) {
                 $this->page_id = $page->id;

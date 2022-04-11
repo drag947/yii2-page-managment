@@ -56,6 +56,7 @@ class UrlService {
         if(!$this->isUniquePage($route, $params)) {
             throw new MessageException('Страница с таким url уже создана: '.$path);
         }
+        $params = $this->replaceSlugReverse($params);
         
         $page = new PageManagment();
         $page->route = $route;
@@ -302,6 +303,7 @@ class UrlService {
             $result = [$alias->page->route, $alias->page->params];
         }else{
             list($route, $params) = self::spreadUrl($path);
+            $params = $this->replaceSlugReverse($params);
             $request = new \yii\web\Request();
             $request->setUrl($path);
             $request->setQueryParams($params);
